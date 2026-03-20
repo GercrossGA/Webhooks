@@ -1,0 +1,47 @@
+pipeline {
+    agent any
+
+    // Definimos herramientas para que Jenkins las reconozca (opcional si usas Docker)
+    tools {
+        maven 'Maven 3.9' // El nombre debe coincidir con lo configurado en Jenkins Global Tool Config
+        jdk 'Java 17'
+    }
+
+    stages {
+        stage('Limpieza y Compilación') {
+            steps {
+                echo 'Compilando el proyecto Spring Boot...'
+                // Si usas Maven:
+                sh './mvnw clean package -DskipTests' 
+            }
+        }
+
+        stage('Tests Unitarios') {
+            steps {
+                echo 'Ejecutando pruebas...'
+                sh './mvnw test'
+            }
+        }
+
+        stage('Construcción de Imagen Docker') {
+            steps {
+                echo 'Creando imagen de la aplicación...'
+                // Aquí usas la IP privada de tu instancia_2 (Registry) que te da Terraform
+                script {
+                    def registryIp = "digitalocean_droplet.instancia_2.ipv4_address_private:5000"
+                    sh "docker build -t ${registryIp}/mi-app-springboot:latest ."
+                    sh "docker push ${registryIp}/mi-app-springboot:latest"
+                }
+            }
+        }
+    }
+    
+    post {
+        success {
+            echo '¡Pipeline finalizado con éxito!'
+        }
+        failure {
+            echo 'Hubo un error en el Pipeline. Revisa los logs.'
+        }
+    }
+}
