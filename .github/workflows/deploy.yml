@@ -1,0 +1,29 @@
+name: Despliegue Automatico Instancia 3
+
+# El disparador (Trigger)
+on:
+  pull_request:
+    branches: [ main ]
+    types: [ closed ] # Se ejecuta cuando el PR se cierra
+
+jobs:
+  deploy:
+    # Solo corre si el PR se cerró porque se aceptó (Merge), no si se canceló
+    if: github.event.pull_request.merged == true
+    runs-on: self-hosted  # CRÍTICO: Esto le dice a GitHub que use tu Droplet
+    
+    steps:
+      - name: Descargar codigo del repo
+        uses: actions/checkout@v4
+
+      - name: Desplegar Ambiente Desarrollo
+        run: |
+          cd /opt/app/dev
+          docker-compose pull
+          docker-compose up -d
+
+      - name: Desplegar Ambiente Produccion
+        run: |
+          cd /opt/app/prod
+          docker-compose pull
+          docker-compose up -d
