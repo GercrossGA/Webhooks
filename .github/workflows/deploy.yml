@@ -8,9 +8,9 @@ on:
 
 jobs:
   deploy:
-    # Solo corre si el PR se cerró porque se aceptó (Merge), no si se canceló
+    # Solo corre si el PR se cerró porque se aceptó (Merge)
     if: github.event.pull_request.merged == true
-    runs-on: self-hosted  # CRÍTICO: Esto le dice a GitHub que use tu Droplet
+    runs-on: self-hosted  # Esto le dice a GitHub que use el Droplet
     
     steps:
       - name: Descargar codigo del repo
