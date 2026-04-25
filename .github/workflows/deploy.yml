@@ -4,7 +4,7 @@ name: Despliegue Automatico Instancia 3
 on:
   pull_request:
     branches: [ main ]
-    types: [ closed ] # Se ejecuta cuando el PR se cierra
+    types: [ closed ] # Se ejecuta cuando el Pull Request se cierra
 
 jobs:
   deploy:
