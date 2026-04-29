@@ -1,31 +1,28 @@
 name: Despliegue Automatico Instancia 3
 
+
 on:
-  push:
-    branches: [ developer ] # Despliega Dev cada vez que subes código
   pull_request:
     branches: [ main ]
-    types: [ closed ]      # Despliega Prod solo al aceptar el PR
+    types: [ closed ] # Se ejecuta cuando el Pull Request se cierra
 
 jobs:
-  # --- JOB PARA DESARROLLO ---
-  deploy-dev:
-    if: github.ref == 'refs/heads/developer'
-    runs-on: self-hosted
+  deploy:
+    # Solo corre si el PR se cerró porque se aceptó (Merge)
+    if: github.event.pull_request.merged == true
+    runs-on: self-hosted  # Esto le dice a GitHub que use el Droplet
+    
     steps:
-      - name: Actualizar Ambiente Desarrollo
+      - name: Descargar codigo del repo
+        uses: actions/checkout@v4
+
+      - name: Desplegar Ambiente Desarrollo
         run: |
           cd /opt/app/dev
           docker-compose pull
           docker-compose up -d
-  
-  # --- JOB PARA PRODUCCIÓN ---
-  deploy-prod:
-    # Solo corre si el PR a main se cerró Y se hizo merge
-    if: github.event.pull_request.merged == true
-    runs-on: self-hosted
-    steps:
-      - name: Actualizar Ambiente Produccion
+
+      - name: Desplegar Ambiente Produccion
         run: |
           cd /opt/app/prod
           docker-compose pull
